@@ -1,14 +1,23 @@
 using GalloFlix.Data;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+// Serviço de Conexão com o Banco de Dados
 string conn = builder.Configuration.GetConnectionString("GalloFlixConnection");
 var version = ServerVersion.AutoDetect(conn);
 builder.Services.AddDbContext<AppDbContext>(
     opt => opt.UseMySql(conn, version)
 );
+
+// Serviço de Gestão de Usuários
+builder.Services.AddIdentity<IdentityUser, IdentityRole>(
+    opt => opt.SignIn.RequireConfirmedAccount = false
+)
+.AddEntityFrameworkStores<AppDbContext>()
+.AddDefaultTokenProviders();
 
 builder.Services.AddControllersWithViews();
 
